@@ -1,0 +1,273 @@
+type Blog @aws_cognito_user_pools {
+  id: ID!
+  name: String!
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+  owner: String
+  posts(filter: ModelPostFilterInput, sortDirection: ModelSortDirection, limit: Int, nextToken: String): ModelPostConnection @aws_cognito_user_pools
+}
+
+type Post @aws_cognito_user_pools {
+  id: ID!
+  title: String!
+  blogID: ID!
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+  blog: Blog @aws_cognito_user_pools
+  owner: String
+  comments(content: ModelStringKeyConditionInput, filter: ModelCommentFilterInput, sortDirection: ModelSortDirection, limit: Int, nextToken: String): ModelCommentConnection @aws_cognito_user_pools
+}
+
+type Comment @aws_cognito_user_pools {
+  id: ID!
+  postID: ID!
+  content: String!
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+  post: Post @aws_cognito_user_pools
+  owner: String
+}
+
+enum ModelSortDirection {
+  ASC
+  DESC
+}
+
+type ModelBlogConnection @aws_cognito_user_pools {
+  items: [Blog]!
+  nextToken: String
+}
+
+input ModelStringInput {
+  ne: String
+  eq: String
+  le: String
+  lt: String
+  ge: String
+  gt: String
+  contains: String
+  notContains: String
+  between: [String]
+  beginsWith: String
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+  size: ModelSizeInput
+}
+
+input ModelIDInput {
+  ne: ID
+  eq: ID
+  le: ID
+  lt: ID
+  ge: ID
+  gt: ID
+  contains: ID
+  notContains: ID
+  between: [ID]
+  beginsWith: ID
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+  size: ModelSizeInput
+}
+
+input ModelIntInput {
+  ne: Int
+  eq: Int
+  le: Int
+  lt: Int
+  ge: Int
+  gt: Int
+  between: [Int]
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+}
+
+input ModelFloatInput {
+  ne: Float
+  eq: Float
+  le: Float
+  lt: Float
+  ge: Float
+  gt: Float
+  between: [Float]
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+}
+
+input ModelBooleanInput {
+  ne: Boolean
+  eq: Boolean
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+}
+
+input ModelSizeInput {
+  ne: Int
+  eq: Int
+  le: Int
+  lt: Int
+  ge: Int
+  gt: Int
+  between: [Int]
+}
+
+input ModelBlogFilterInput {
+  id: ModelIDInput
+  name: ModelStringInput
+  and: [ModelBlogFilterInput]
+  or: [ModelBlogFilterInput]
+  not: ModelBlogFilterInput
+}
+
+enum ModelAttributeTypes {
+  binary
+  binarySet
+  bool
+  list
+  map
+  number
+  numberSet
+  string
+  stringSet
+  _null
+}
+
+type Query {
+  getBlog(id: ID!): Blog @aws_cognito_user_pools
+  listBlogs(filter: ModelBlogFilterInput, limit: Int, nextToken: String): ModelBlogConnection @aws_cognito_user_pools
+  getPost(id: ID!): Post @aws_cognito_user_pools
+  listPosts(filter: ModelPostFilterInput, limit: Int, nextToken: String): ModelPostConnection @aws_cognito_user_pools
+  getComment(id: ID!): Comment @aws_cognito_user_pools
+  listComments(filter: ModelCommentFilterInput, limit: Int, nextToken: String): ModelCommentConnection @aws_cognito_user_pools
+}
+
+input CreateBlogInput {
+  id: ID
+  name: String!
+}
+
+input UpdateBlogInput {
+  id: ID!
+  name: String
+}
+
+input DeleteBlogInput {
+  id: ID!
+}
+
+type Mutation {
+  createBlog(input: CreateBlogInput!, condition: ModelBlogConditionInput): Blog @aws_cognito_user_pools
+  updateBlog(input: UpdateBlogInput!, condition: ModelBlogConditionInput): Blog @aws_cognito_user_pools
+  deleteBlog(input: DeleteBlogInput!, condition: ModelBlogConditionInput): Blog @aws_cognito_user_pools
+  createPost(input: CreatePostInput!, condition: ModelPostConditionInput): Post @aws_cognito_user_pools
+  updatePost(input: UpdatePostInput!, condition: ModelPostConditionInput): Post @aws_cognito_user_pools
+  deletePost(input: DeletePostInput!, condition: ModelPostConditionInput): Post @aws_cognito_user_pools
+  createComment(input: CreateCommentInput!, condition: ModelCommentConditionInput): Comment @aws_cognito_user_pools
+  updateComment(input: UpdateCommentInput!, condition: ModelCommentConditionInput): Comment @aws_cognito_user_pools
+  deleteComment(input: DeleteCommentInput!, condition: ModelCommentConditionInput): Comment @aws_cognito_user_pools
+}
+
+input ModelBlogConditionInput {
+  name: ModelStringInput
+  and: [ModelBlogConditionInput]
+  or: [ModelBlogConditionInput]
+  not: ModelBlogConditionInput
+}
+
+type Subscription {
+  onCreateBlog(owner: String!): Blog @aws_subscribe(mutations: ["createBlog"]) @aws_cognito_user_pools
+  onUpdateBlog(owner: String!): Blog @aws_subscribe(mutations: ["updateBlog"]) @aws_cognito_user_pools
+  onDeleteBlog(owner: String!): Blog @aws_subscribe(mutations: ["deleteBlog"]) @aws_cognito_user_pools
+  onCreatePost(owner: String!): Post @aws_subscribe(mutations: ["createPost"]) @aws_cognito_user_pools
+  onUpdatePost(owner: String!): Post @aws_subscribe(mutations: ["updatePost"]) @aws_cognito_user_pools
+  onDeletePost(owner: String!): Post @aws_subscribe(mutations: ["deletePost"]) @aws_cognito_user_pools
+  onCreateComment(owner: String!): Comment @aws_subscribe(mutations: ["createComment"]) @aws_cognito_user_pools
+  onUpdateComment(owner: String!): Comment @aws_subscribe(mutations: ["updateComment"]) @aws_cognito_user_pools
+  onDeleteComment(owner: String!): Comment @aws_subscribe(mutations: ["deleteComment"]) @aws_cognito_user_pools
+}
+
+type ModelPostConnection @aws_cognito_user_pools {
+  items: [Post]!
+  nextToken: String
+}
+
+input ModelPostFilterInput {
+  id: ModelIDInput
+  title: ModelStringInput
+  blogID: ModelIDInput
+  and: [ModelPostFilterInput]
+  or: [ModelPostFilterInput]
+  not: ModelPostFilterInput
+}
+
+input CreatePostInput {
+  id: ID
+  title: String!
+  blogID: ID!
+}
+
+input UpdatePostInput {
+  id: ID!
+  title: String
+  blogID: ID
+}
+
+input DeletePostInput {
+  id: ID!
+}
+
+input ModelPostConditionInput {
+  title: ModelStringInput
+  blogID: ModelIDInput
+  and: [ModelPostConditionInput]
+  or: [ModelPostConditionInput]
+  not: ModelPostConditionInput
+}
+
+type ModelCommentConnection @aws_cognito_user_pools {
+  items: [Comment]!
+  nextToken: String
+}
+
+input ModelCommentFilterInput {
+  id: ModelIDInput
+  postID: ModelIDInput
+  content: ModelStringInput
+  and: [ModelCommentFilterInput]
+  or: [ModelCommentFilterInput]
+  not: ModelCommentFilterInput
+}
+
+input CreateCommentInput {
+  id: ID
+  postID: ID!
+  content: String!
+}
+
+input UpdateCommentInput {
+  id: ID!
+  postID: ID
+  content: String
+}
+
+input DeleteCommentInput {
+  id: ID!
+}
+
+input ModelCommentConditionInput {
+  postID: ModelIDInput
+  content: ModelStringInput
+  and: [ModelCommentConditionInput]
+  or: [ModelCommentConditionInput]
+  not: ModelCommentConditionInput
+}
+
+input ModelStringKeyConditionInput {
+  eq: String
+  le: String
+  lt: String
+  ge: String
+  gt: String
+  between: [String]
+  beginsWith: String
+}
