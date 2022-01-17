@@ -1,20 +1,12 @@
-type Blog @model @auth(rules: [{ allow: public }]) {
+type Bank @model @auth(rules: [{ allow: public }]) {
   id: ID!
   name: String!
-  posts: [Post] @connection(keyName: "byBlog", fields: ["id"])
+  incomingFiles: [IncomingFile] @connection(keyName: "byBank", fields: ["id"])
 }
 
-type Post @model @auth(rules: [{ allow: public }]) @key(name: "byBlog", fields: ["blogID"]) {
+type IncomingFile @model @auth(rules: [{ allow: public }]) @key(name: "byBank", fields: ["bankID"]) {
   id: ID!
   title: String!
-  blogID: ID!
-  blog: Blog @connection(fields: ["blogID"])
-  comments: [Comment] @connection(keyName: "byPost", fields: ["id"])
-}
-
-type Comment @model @auth(rules: [{ allow: public }]) @key(name: "byPost", fields: ["postID", "content"]) {
-  id: ID!
-  postID: ID!
-  post: Post @connection(fields: ["postID"])
-  content: String!
+  bankID: ID!
+  bank: Bank @connection(fields: ["bankID"])
 }
