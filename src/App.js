@@ -2,21 +2,14 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react'
-import Amplify, { API, graphqlOperation } from "aws-amplify";
 import aws_exports from './aws-exports';
-import { listBlogs } from "./graphql/queries";
-
+import Amplify, { API } from 'aws-amplify';
+import * as queries from './graphql/queries';
 Amplify.configure(aws_exports);
 
-async function getData() {
- API.graphql(graphqlOperation(listBlogs)).then((evt) => {
-   evt.data.listBlogs.items.map((blog, i) => {
-     QueryResult.innerHTML += `<p>${blog.id} - ${blog.name}</p>`;
-   });
- });
-}
+const QueryResult = API.graphql({ query: queries.listBlogs });
 
-const QueryResult = document.getElementById("QueryResult");
+alert(QueryResult);
 
 class App extends Component {
   render() {
@@ -46,7 +39,5 @@ class App extends Component {
     );
   }
 }
-
-getData();
 
 export default withAuthenticator(App);
