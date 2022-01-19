@@ -43,7 +43,7 @@ const App = () => {
   return (
     <div style={styles.container}>
       <AmplifySignOut />
-      <h2>Amplify Todos</h2>
+      <h2>Avannis Banks</h2>
       <input
         onChange={event => setInput('id', event.target.value)}
         style={styles.input}
@@ -56,10 +56,10 @@ const App = () => {
         value={formState.name}
         placeholder="Name"
       />
-      <button style={styles.button} onClick={addTodo}>Create Blog</button>
+      <button style={styles.button} onClick={addTodo}>Create Bank</button>
       {
         todos.map((todo, index) => (
-          <div key={todo.id ? todo.id : index} style={styles.todo}>
+          <div key={todo.id} style={styles.todo}>
             <p style={styles.todoName}>{todo.name}</p>
           </div>
         ))

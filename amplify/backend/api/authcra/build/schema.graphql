@@ -1,31 +1,29 @@
-type Blog @aws_cognito_user_pools {
+type Blog {
   id: ID!
   name: String!
+  posts(filter: ModelPostFilterInput, sortDirection: ModelSortDirection, limit: Int, nextToken: String): ModelPostConnection
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
-  owner: String
-  posts(filter: ModelPostFilterInput, sortDirection: ModelSortDirection, limit: Int, nextToken: String): ModelPostConnection @aws_cognito_user_pools
 }
 
-type Post @aws_cognito_user_pools {
+type Post {
   id: ID!
   title: String!
+  status: String!
   blogID: ID!
+  blog: Blog
+  comments(content: ModelStringKeyConditionInput, filter: ModelCommentFilterInput, sortDirection: ModelSortDirection, limit: Int, nextToken: String): ModelCommentConnection
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
-  blog: Blog @aws_cognito_user_pools
-  owner: String
-  comments(content: ModelStringKeyConditionInput, filter: ModelCommentFilterInput, sortDirection: ModelSortDirection, limit: Int, nextToken: String): ModelCommentConnection @aws_cognito_user_pools
 }
 
-type Comment @aws_cognito_user_pools {
+type Comment {
   id: ID!
   postID: ID!
+  post: Post
   content: String!
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
-  post: Post @aws_cognito_user_pools
-  owner: String
 }
 
 enum ModelSortDirection {
@@ -33,7 +31,7 @@ enum ModelSortDirection {
   DESC
 }
 
-type ModelBlogConnection @aws_cognito_user_pools {
+type ModelBlogConnection {
   items: [Blog]!
   nextToken: String
 }
@@ -133,12 +131,12 @@ enum ModelAttributeTypes {
 }
 
 type Query {
-  getBlog(id: ID!): Blog @aws_cognito_user_pools
-  listBlogs(filter: ModelBlogFilterInput, limit: Int, nextToken: String): ModelBlogConnection @aws_cognito_user_pools
-  getPost(id: ID!): Post @aws_cognito_user_pools
-  listPosts(filter: ModelPostFilterInput, limit: Int, nextToken: String): ModelPostConnection @aws_cognito_user_pools
-  getComment(id: ID!): Comment @aws_cognito_user_pools
-  listComments(filter: ModelCommentFilterInput, limit: Int, nextToken: String): ModelCommentConnection @aws_cognito_user_pools
+  getBlog(id: ID!): Blog
+  listBlogs(filter: ModelBlogFilterInput, limit: Int, nextToken: String): ModelBlogConnection
+  getPost(id: ID!): Post
+  listPosts(filter: ModelPostFilterInput, limit: Int, nextToken: String): ModelPostConnection
+  getComment(id: ID!): Comment
+  listComments(filter: ModelCommentFilterInput, limit: Int, nextToken: String): ModelCommentConnection
 }
 
 input CreateBlogInput {
@@ -156,15 +154,15 @@ input DeleteBlogInput {
 }
 
 type Mutation {
-  createBlog(input: CreateBlogInput!, condition: ModelBlogConditionInput): Blog @aws_cognito_user_pools
-  updateBlog(input: UpdateBlogInput!, condition: ModelBlogConditionInput): Blog @aws_cognito_user_pools
-  deleteBlog(input: DeleteBlogInput!, condition: ModelBlogConditionInput): Blog @aws_cognito_user_pools
-  createPost(input: CreatePostInput!, condition: ModelPostConditionInput): Post @aws_cognito_user_pools
-  updatePost(input: UpdatePostInput!, condition: ModelPostConditionInput): Post @aws_cognito_user_pools
-  deletePost(input: DeletePostInput!, condition: ModelPostConditionInput): Post @aws_cognito_user_pools
-  createComment(input: CreateCommentInput!, condition: ModelCommentConditionInput): Comment @aws_cognito_user_pools
-  updateComment(input: UpdateCommentInput!, condition: ModelCommentConditionInput): Comment @aws_cognito_user_pools
-  deleteComment(input: DeleteCommentInput!, condition: ModelCommentConditionInput): Comment @aws_cognito_user_pools
+  createBlog(input: CreateBlogInput!, condition: ModelBlogConditionInput): Blog
+  updateBlog(input: UpdateBlogInput!, condition: ModelBlogConditionInput): Blog
+  deleteBlog(input: DeleteBlogInput!, condition: ModelBlogConditionInput): Blog
+  createPost(input: CreatePostInput!, condition: ModelPostConditionInput): Post
+  updatePost(input: UpdatePostInput!, condition: ModelPostConditionInput): Post
+  deletePost(input: DeletePostInput!, condition: ModelPostConditionInput): Post
+  createComment(input: CreateCommentInput!, condition: ModelCommentConditionInput): Comment
+  updateComment(input: UpdateCommentInput!, condition: ModelCommentConditionInput): Comment
+  deleteComment(input: DeleteCommentInput!, condition: ModelCommentConditionInput): Comment
 }
 
 input ModelBlogConditionInput {
@@ -175,18 +173,18 @@ input ModelBlogConditionInput {
 }
 
 type Subscription {
-  onCreateBlog(owner: String!): Blog @aws_subscribe(mutations: ["createBlog"]) @aws_cognito_user_pools
-  onUpdateBlog(owner: String!): Blog @aws_subscribe(mutations: ["updateBlog"]) @aws_cognito_user_pools
-  onDeleteBlog(owner: String!): Blog @aws_subscribe(mutations: ["deleteBlog"]) @aws_cognito_user_pools
-  onCreatePost(owner: String!): Post @aws_subscribe(mutations: ["createPost"]) @aws_cognito_user_pools
-  onUpdatePost(owner: String!): Post @aws_subscribe(mutations: ["updatePost"]) @aws_cognito_user_pools
-  onDeletePost(owner: String!): Post @aws_subscribe(mutations: ["deletePost"]) @aws_cognito_user_pools
-  onCreateComment(owner: String!): Comment @aws_subscribe(mutations: ["createComment"]) @aws_cognito_user_pools
-  onUpdateComment(owner: String!): Comment @aws_subscribe(mutations: ["updateComment"]) @aws_cognito_user_pools
-  onDeleteComment(owner: String!): Comment @aws_subscribe(mutations: ["deleteComment"]) @aws_cognito_user_pools
+  onCreateBlog: Blog @aws_subscribe(mutations: ["createBlog"])
+  onUpdateBlog: Blog @aws_subscribe(mutations: ["updateBlog"])
+  onDeleteBlog: Blog @aws_subscribe(mutations: ["deleteBlog"])
+  onCreatePost: Post @aws_subscribe(mutations: ["createPost"])
+  onUpdatePost: Post @aws_subscribe(mutations: ["updatePost"])
+  onDeletePost: Post @aws_subscribe(mutations: ["deletePost"])
+  onCreateComment: Comment @aws_subscribe(mutations: ["createComment"])
+  onUpdateComment: Comment @aws_subscribe(mutations: ["updateComment"])
+  onDeleteComment: Comment @aws_subscribe(mutations: ["deleteComment"])
 }
 
-type ModelPostConnection @aws_cognito_user_pools {
+type ModelPostConnection {
   items: [Post]!
   nextToken: String
 }
@@ -194,6 +192,7 @@ type ModelPostConnection @aws_cognito_user_pools {
 input ModelPostFilterInput {
   id: ModelIDInput
   title: ModelStringInput
+  status: ModelStringInput
   blogID: ModelIDInput
   and: [ModelPostFilterInput]
   or: [ModelPostFilterInput]
@@ -203,12 +202,14 @@ input ModelPostFilterInput {
 input CreatePostInput {
   id: ID
   title: String!
+  status: String!
   blogID: ID!
 }
 
 input UpdatePostInput {
   id: ID!
   title: String
+  status: String
   blogID: ID
 }
 
@@ -218,13 +219,14 @@ input DeletePostInput {
 
 input ModelPostConditionInput {
   title: ModelStringInput
+  status: ModelStringInput
   blogID: ModelIDInput
   and: [ModelPostConditionInput]
   or: [ModelPostConditionInput]
   not: ModelPostConditionInput
 }
 
-type ModelCommentConnection @aws_cognito_user_pools {
+type ModelCommentConnection {
   items: [Comment]!
   nextToken: String
 }
