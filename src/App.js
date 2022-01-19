@@ -6,7 +6,7 @@ import { withAuthenticator } from '@aws-amplify/ui-react'
 import awsExports from "./aws-exports";
 Amplify.configure(awsExports);
 
-const initialState = { name: ''}
+const initialState = { id: '', name: ''}
 
 const App = () => {
   const [formState, setFormState] = useState(initialState)
@@ -30,7 +30,7 @@ const App = () => {
 
   async function addTodo() {
     try {
-      if (!formState.name) return
+      if (!formState.id || !formState.name) return
       const todo = { ...formState }
       setTodos([...todos, todo])
       setFormState(initialState)
@@ -43,6 +43,12 @@ const App = () => {
   return (
     <div style={styles.container}>
       <h2>Amplify Todos</h2>
+      <input
+        onChange={event => setInput('id', event.target.value)}
+        style={styles.input}
+        value={formState.id}
+        placeholder="ID"
+      />
       <input
         onChange={event => setInput('name', event.target.value)}
         style={styles.input}
